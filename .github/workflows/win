@@ -1,0 +1,35 @@
+name: Build C Project on Windows
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup MSBuild tools
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Install CMake
+      uses: jwlawson/actions-cmake-install@v1
+      with:
+        version: '3.21.1' # 指定你希望使用的 CMake 版本
+
+    - name: Configure CMake
+      run: cmake -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build project
+      run: cmake --build build --config Release --target ALL_BUILD
+
+    - name: Archive binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: c-project-binaries
+        path: build/Release/hcxpcapngtool.exe
